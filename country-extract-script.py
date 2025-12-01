@@ -16,6 +16,7 @@ while True:
     username = input("Enter your database username: ")
     password = input("Enter your database password: ")
     userdb = input("Enter database name: ")
+    tablename = input("Enter table name (warning if tablename exists it will be dropped): ")
     try:
         mydb = mysql.connector.connect(
             host="localhost", user=username, password=password, database=userdb
@@ -27,19 +28,19 @@ while True:
 
 
 mycursor = mydb.cursor()
-mycursor.execute("""
-DROP TABLE IF EXISTS countries
+mycursor.execute(f"""
+DROP TABLE IF EXISTS {tablename}
 """)
 
-mycursor.execute("""
-CREATE TABLE IF NOT EXISTS countries (CountryID
+mycursor.execute(f"""
+CREATE TABLE IF NOT EXISTS {tablename} (CountryID
 int NOT NULL AUTO_INCREMENT, CountryName varchar(255) NOT NULL,
 ISOcode varchar(2) NOT NULL, PRIMARY KEY (CountryID))
 """)
 
 for country in result:
     mycursor.execute(
-        "INSERT INTO countries (countryName, ISOcode) VALUES (%s, %s)",
+        f"INSERT INTO {tablename} (countryName, ISOcode) VALUES (%s, %s)",
         (country["sName"], country["sISOCode"]),
     )
 
@@ -52,15 +53,15 @@ while True:
     )
 
     if sorting == "Y":
-        mycursor.execute("""
-        SELECT countryName, ISOcode FROM countries
+        mycursor.execute(f"""
+        SELECT countryName, ISOcode FROM {tablename}
         ORDER BY countryName ASC
         LIMIT 10
         """)
         break
     elif sorting == "N":
-        mycursor.execute("""
-        SELECT countryName, ISOcode FROM countries
+        mycursor.execute(f"""
+        SELECT countryName, ISOcode FROM {tablename}
         ORDER BY ISOcode ASC
         LIMIT 10
         """)
